@@ -1,0 +1,130 @@
+library(shiny)
+
+# Define UI for application that draws a histogram
+ui <- shinyUI(fluidPage(
+   
+   # Application title
+   titlePanel("Junior Doctors' Pay Calculator v.0.1"),
+   
+   # Sidebar with a slider input for number of bins 
+   sidebarLayout(
+      sidebarPanel(
+              selectInput("grade",
+                          "On the day that you start or move onto the new contract what will your training grade be?
+",                     
+                          choices = c("FY1", "FY2", "CT1/ST1", "CT2/ST2", "CT3/ST3", "ST4", "ST5", "ST6", "ST7", "ST8")
+                          ),
+              sliderInput("weeklyHours",
+                          "What is the average number of hours per week you will work on your rota?",
+                          min = 0,
+                          max = 72,
+                          value = 40, 
+                          step = 0.25
+                          ),
+              sliderInput("enhancedHours",
+                          "What is the average number of enhanced hours (hours between 21:00 and 08:00hrs) per week you will work on your rota?",
+                          min = 0,
+                          max = 40,
+                          value = 5,
+                          step = 0.25
+              ),
+              selectInput("weekendFreq",
+                          "What is the average frequency of weekends worked on your rota?",                     
+                          choices = c("1:2", "<1:2 - 1:4", "<1:4 - 1:5", "<1:5 - 1:7", "<1:7 - 1:8", "<1:8")
+              ),
+              radioButtons("NROC",
+                           "Do you do Non-Resident On-Calls?",
+                           choices = c("Yes", "No"),
+                           selected = "No"),
+              radioButtons("FPP",
+                           "Are you a specialty trainee in one of the following specialties?",
+                           choices = c("Emergency Medicine","GP", "Psychiatry", "Oral/Maxillofacial Surgery", "None of the above"),
+                           selected = "None of the above"),
+              radioButtons("acadFPP",
+                           "Will you be eligible for the Academic Flexible Pay Premium (successfully completed a higher academic degree)?",
+                           choices = c("Yes", "No"),
+                           selected = "No")
+              
+      ),
+      
+      # Show a plot of the generated distribution
+      mainPanel(
+         plotOutput("payPlot")
+      )
+   )
+))
+
+# Define server logic required to draw a histogram
+server <- shinyServer(function(input, output) {
+   
+   output$payPlot <- renderPlot({
+           if (input$grade=="FY1") {
+                   basicPay <- 26350
+                   nodalPoint <- 1
+           } else if (input$grade=="FY2") {
+                   basicPay <- 30500
+                   nodalPoint <- 2
+           } else if (input$grade=="CT1/ST1"|input$grade=="CT2/ST2") {
+                   basicPay <- 36100
+                   nodalPoint <- 3
+           } else if (input$grade=="CT3/ST3") {
+                   basicPay <- 45750
+                   nodalPoint <- 4
+           } else {
+                   basicPay <- 45750
+                   nodalPoint <- 4
+           }
+           
+           hrlyPay <- basicPay/365.25*7/40
+           
+           if (input$weeklyHours>40) {
+                   addhrsPay <- (input$weeklyHours - 40) * hrlyPay * 365.25/7
+           } else {
+                   addhrsPay <- 0
+           }
+           
+           enhrsPay <- input$enhancedHours * hrlyPay * 0.37 * 365.25/7
+           
+           if (input$weekendFreq=="1:2") {
+                   weekendPay <- basicPay * 0.10
+           } else if (input$weekendFreq=="<1:2 - 1:4") {
+                   weekendPay <- basicPay * 0.075
+           } else if (input$weekendFreq=="<1:4 - 1:5") {
+                   weekendPay <- basicPay * 0.06
+           } else if (input$weekendFreq=="<1:5 - 1:7") {
+                   weekendPay <- basicPay * 0.04
+           } else if (input$weekendFreq=="<1:7 - 1:8") {
+                   weekendPay <- basicPay * 0.03
+           } else {
+                   weekendPay <- 0
+           }
+           
+           if (input$NROC=="Yes") {
+                   if (nodalPoint==1) {
+                           NROCPay <- 2108
+                   } else if (nodalPoint==2) {
+                           NROCPay <- 2440
+                   } else if (nodalPoint==3) {
+                           NROCPay <- 2888
+                   } else {
+                           NROCPay <- 3660
+                   }
+           } else {
+                   NROCPay <- 0
+           }
+           
+           x <- cbind(basicPay, addhrsPay, enhrsPay, weekendPay, NROCPay)
+           barplot(x, col = "skyblue", border = 'white',
+                   main=paste0("Total Annual Salary = £",round(sum(x),2)),
+                   names.arg = c(paste0("Basic Pay\n£", basicPay),
+                                 paste0("Add. Hrs Suppl.\n£", addhrsPay), 
+                                 paste0("Enhance. (OOH) Suppl.\n£", enhrsPay),
+                                 paste0("W/E Freq. Suppl.\n£", weekendPay),
+                                 paste0("NROC avail. allowance\n£", NROCPay)))
+           
+   })
+})
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+
