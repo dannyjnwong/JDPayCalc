@@ -4,7 +4,7 @@ library(shiny)
 ui <- shinyUI(fluidPage(
    
    # Application title
-   titlePanel("Junior Doctors' Pay Calculator v.0.1"),
+   titlePanel("Junior Doctors' Pay Calculator v.0.2"),
    
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
@@ -27,23 +27,26 @@ ui <- shinyUI(fluidPage(
                           max = 40,
                           value = 5,
                           step = 0.25
-              ),
+                          ),
               selectInput("weekendFreq",
                           "What is the average frequency of weekends worked on your rota?",                     
                           choices = c("1:2", "<1:2 - 1:4", "<1:4 - 1:5", "<1:5 - 1:7", "<1:7 - 1:8", "<1:8")
-              ),
+                          ),
               radioButtons("NROC",
                            "Do you do Non-Resident On-Calls?",
                            choices = c("Yes", "No"),
-                           selected = "No"),
+                           selected = "No"
+                           ),
               radioButtons("FPP",
                            "Are you a specialty trainee in one of the following specialties?",
                            choices = c("Emergency Medicine","GP", "Psychiatry", "Oral/Maxillofacial Surgery", "None of the above"),
-                           selected = "None of the above"),
+                           selected = "None of the above"
+                           ),
               radioButtons("acadFPP",
                            "Will you be eligible for the Academic Flexible Pay Premium (successfully completed a higher academic degree)?",
                            choices = c("Yes", "No"),
-                           selected = "No")
+                           selected = "No"
+                           )
               
       ),
       
@@ -115,14 +118,88 @@ server <- shinyServer(function(input, output) {
                    NROCPay <- 0
            }
            
-           x <- cbind(basicPay, addhrsPay, enhrsPay, weekendPay, NROCPay)
-           barplot(x, col = "skyblue", border = 'white',
+           if (input$FPP=="Emergency Medicine") {
+                   if (input$grade=="ST4") {
+                           FPPay <- 20000/3
+                   } else if (input$grade=="ST5") {
+                           FPPay <- 20000/2
+                   } else if (input$grade=="ST6") {
+                           FPPay <- 20000
+                   } else {
+                           FPPay <- 0
+                   }
+           } else if (input$FPP=="GP" & (input$grade=="CT1/ST1" | 
+                                         input$grade=="CT2/ST2" | 
+                                         input$grade=="CT3/ST3" | 
+                                         input$grade=="ST4" | 
+                                         input$grade=="ST5" | 
+                                         input$grade=="ST6" | 
+                                         input$grade=="ST7"| 
+                                         input$grade=="ST8")) {
+                   FPPay <- 8200
+           } else if (input$FPP=="Psychiatry"){
+                   if (input$grade=="CT1/ST1") {
+                           FPPay <- 20000/6
+                   } else if (input$grade=="CT2/ST2") {
+                           FPPay <- 20000/5
+                   } else if (input$grade=="CT3/ST3") {
+                           FPPay <- 20000/4
+                   } else if (input$grade=="ST4") {
+                           FPPay <- 20000/3
+                   } else if (input$grade=="ST5") {
+                           FPPay <- 20000/2
+                   } else if (input$grade=="ST6") {
+                           FPPay <- 20000
+                   } else if (input$grade=="FY1" | input$grade=="FY2") {
+                           FPPay <- 0
+                   } else {
+                           FPPay <- 20000
+                   }
+           } else if (input$FPP=="Oral/Maxillofacial Surgery") {
+                   if (input$grade=="CT3/ST3") {
+                           FPPay <- 20000/5
+                   } else if (input$grade=="ST4") {
+                           FPPay <- 20000/4
+                   } else if (input$grade=="ST5") {
+                           FPPay <- 20000/3
+                   } else if (input$grade=="ST6") {
+                           FPPay <- 20000/2
+                   } else if (input$grade=="ST7") {
+                           FPPay <- 20000
+                   } else {
+                           FPPay <- 0
+                   }
+           } else {
+                   FPPay <- 0
+           }
+           
+           if (input$acadFPP=="Yes") {
+                   acadFPPay <- 4000
+           } else {
+                   acadFPPay <- 0
+           }
+           
+           FPPay <- FPPay + acadFPPay
+           
+           basicPay <- round(basicPay, 2)
+           addhrsPay <- round(addhrsPay, 2) 
+           enhrsPay <- round(enhrsPay, 2) 
+           weekendPay <- round(weekendPay, 2) 
+           NROCPay <- round(NROCPay, 2) 
+           FPPay <- round(FPPay, 2)
+           
+           x <- cbind(basicPay, addhrsPay, enhrsPay, weekendPay, NROCPay, FPPay)
+                              
+           barplot(x,
                    main=paste0("Total Annual Salary = £",round(sum(x),2)),
+                   col=c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462"),
+                   border = 'white',
                    names.arg = c(paste0("Basic Pay\n£", basicPay),
                                  paste0("Add. Hrs Suppl.\n£", addhrsPay), 
                                  paste0("Enhance. (OOH) Suppl.\n£", enhrsPay),
                                  paste0("W/E Freq. Suppl.\n£", weekendPay),
-                                 paste0("NROC avail. allowance\n£", NROCPay)))
+                                 paste0("NROC avail. allowance\n£", NROCPay),
+                                 paste0("Flexible Pay Premium\n£", FPPay)))
            
    })
 })
