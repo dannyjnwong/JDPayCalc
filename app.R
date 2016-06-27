@@ -54,7 +54,7 @@ ui <- shinyUI(fluidPage(
       mainPanel(
          plotOutput("payPlot"),
          
-         p("* This calculator is work in progress, and at the moment does not model trainees' earnings on Less-Than-Full-Time (LTFT) training, payment for all work done arrangments, nor income tax, for example.")
+         p("* This calculator is work in progress, and at the moment does not model trainees' earnings on Less-Than-Full-Time (LTFT) training, payment for all work done arrangements, nor income tax, for example.")
       )
    )
 ))
