@@ -1,12 +1,12 @@
 library(shiny)
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- shinyUI(fluidPage(
    
    # Application title
    titlePanel("Junior Doctors' Pay Calculator v.0.2"),
    
-   # Sidebar with a slider input for number of bins 
+   # Sidebar with a number of inputs
    sidebarLayout(
       sidebarPanel(
               selectInput("grade",
@@ -50,7 +50,7 @@ ui <- shinyUI(fluidPage(
               
       ),
       
-      # Show a plot of the generated distribution
+      # Show a plot
       mainPanel(
          plotOutput("payPlot"),
          
@@ -59,7 +59,7 @@ ui <- shinyUI(fluidPage(
    )
 ))
 
-# Define server logic required to draw a histogram
+# Define server logic required to draw a plot
 server <- shinyServer(function(input, output) {
    
    output$payPlot <- renderPlot({
