@@ -5,6 +5,10 @@ ui <- shinyUI(fluidPage(
    
    # Application title
    titlePanel("Junior Doctors' Pay Calculator v.0.2"),
+   p("Instructions: You will need to have knowledge of the rota you will likely be working on for accurate calculations. Work out the average number of hours worked per week and the average number of enhanced hours (hours between 21:00-08:00hrs) worked per week."), 
+   p("This calculator at the moment does not model earnings for trainees on Less-Than-Full-Time (LTFT) training. It also does not calculate remuneration for all work done beyond rostered hour arrangements, nor income tax."),
+   a(href="https://github.com/dannyjnwong/JDPayCalc", "Click here to see the source code for this calculator."),
+   p("MIT License; Copyright (c) 2016 Danny Jon Nian Wong"),
    
    # Sidebar with a number of inputs
    sidebarLayout(
@@ -52,9 +56,8 @@ ui <- shinyUI(fluidPage(
       
       # Show a plot
       mainPanel(
-         plotOutput("payPlot"),
+         plotOutput("payPlot")
          
-         p("* This calculator is work in progress, and at the moment does not model trainees' earnings on Less-Than-Full-Time (LTFT) training, payment for all work done arrangements, nor income tax, for example.")
       )
    )
 ))
