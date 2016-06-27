@@ -192,14 +192,14 @@ server <- shinyServer(function(input, output) {
                               
            barplot(x,
                    main=paste0("Total Annual Salary = £",round(sum(x),2)),
-                   col=c("#8dd3c7", "#ffffb3", "#bebada", "#fb8072", "#80b1d3", "#fdb462"),
+                   col=c("skyblue"),
                    border = 'white',
                    names.arg = c(paste0("Basic Pay\n£", basicPay),
-                                 paste0("Add. Hrs Suppl.\n£", addhrsPay), 
-                                 paste0("Enhance. (OOH) Suppl.\n£", enhrsPay),
-                                 paste0("W/E Freq. Suppl.\n£", weekendPay),
-                                 paste0("NROC avail. allowance\n£", NROCPay),
-                                 paste0("Flexible Pay Premium\n£", FPPay)))
+                                 paste0("Added Hrs\n£", addhrsPay), 
+                                 paste0("Out-of-Hrs\n£", enhrsPay),
+                                 paste0("W/E Suppl.\n£", weekendPay),
+                                 paste0("NROC\n£", NROCPay),
+                                 paste0("FPP\n£", FPPay)))
            
    })
 })
