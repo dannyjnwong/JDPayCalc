@@ -1,4 +1,5 @@
 library(shiny)
+library(xtable)
 
 # Define UI for application
 ui <- shinyUI(fluidPage(
@@ -56,8 +57,8 @@ ui <- shinyUI(fluidPage(
       
       # Show a plot
       mainPanel(
-         plotOutput("payPlot")
-         
+         plotOutput("payPlot"),
+         tableOutput("payTable")
       )
    )
 ))
@@ -209,7 +210,29 @@ server <- shinyServer(function(input, output) {
                                  paste0("W/E Suppl.\n£", values()$weekendPay),
                                  paste0("NROC\n£", values()$NROCPay),
                                  paste0("FPP\n£", values()$FPPay)))
+
+   output$payTable <- renderTable({
            
+           tab <- data.frame(Breakdown = c("Basic salary",
+                                           "Additional hours supplement (above 40hrs/week)",
+                                           "Enhanced hours supplement (21:00-08:00hrs)",
+                                           "Weekend frequency uplift",
+                                           "NROC availability allowance",
+                                           "Flexible Pay Premium",
+                                           "Total"), 
+                             Pay = c(paste0("£", values()$basicPay), 
+                                     paste0("£", values()$addhrsPay), 
+                                     paste0("£", values()$enhrsPay), 
+                                     paste0("£", values()$weekendPay), 
+                                     paste0("£", values()$NROCPay), 
+                                     paste0("£", values()$FPPay),
+                                     paste0("£", sum(unlist(values()))))
+                             )
+           
+           xtable(tab)
+           
+   })
+                      
    })
 })
 
