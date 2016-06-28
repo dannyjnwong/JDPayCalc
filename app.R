@@ -4,7 +4,7 @@ library(shiny)
 ui <- shinyUI(fluidPage(
    
    # Application title
-   titlePanel("Junior Doctors' Pay Calculator v.0.2"),
+   titlePanel("Junior Doctors' Pay Calculator v.0.3"),
    p("Instructions: You will need to have knowledge of the rota you will likely be working on for accurate calculations. Work out the average number of hours worked per week and the average number of enhanced hours (hours between 21:00-08:00hrs) worked per week."), 
    p("This calculator at the moment does not model earnings for trainees on Less-Than-Full-Time (LTFT) training. It also does not calculate remuneration for all work done beyond rostered hour arrangements, nor income tax. If you are using this on a mobile device, the bar chart is best viewed in landscape mode."),
    a(href="https://github.com/dannyjnwong/JDPayCalc", "Click here to see the source code for this calculator."),
@@ -65,7 +65,7 @@ ui <- shinyUI(fluidPage(
 # Define server logic required to draw a plot
 server <- shinyServer(function(input, output) {
    
-   output$payPlot <- renderPlot({
+   values <- function() {
            if (input$grade=="FY1") {
                    basicPay <- 26350
                    nodalPoint <- 1
@@ -185,24 +185,30 @@ server <- shinyServer(function(input, output) {
            FPPay <- FPPay + acadFPPay
            
            basicPay <- round(basicPay, 2)
-           addhrsPay <- round(addhrsPay, 2) 
-           enhrsPay <- round(enhrsPay, 2) 
-           weekendPay <- round(weekendPay, 2) 
-           NROCPay <- round(NROCPay, 2) 
+           addhrsPay <- round(addhrsPay, 2)
+           enhrsPay <- round(enhrsPay, 2)
+           weekendPay <- round(weekendPay, 2)
+           NROCPay <- round(NROCPay, 2)
            FPPay <- round(FPPay, 2)
            
-           x <- cbind(basicPay, addhrsPay, enhrsPay, weekendPay, NROCPay, FPPay)
+           x <- list(basicPay = basicPay, addhrsPay = addhrsPay, enhrsPay = enhrsPay, weekendPay = weekendPay, NROCPay = NROCPay, FPPay = FPPay)
+           return(x)
+   }
+        
+   output$payPlot <- renderPlot({
+           
+           dat <- cbind(values()$basicPay, values()$addhrsPay, values()$enhrsPay, values()$weekendPay, values()$NROCPay, values()$FPPay)
                               
-           barplot(x,
-                   main=paste0("Total Annual Salary = £",round(sum(x),2)),
+           barplot(dat,
+                   main=paste0("Total Annual Salary = £",round(sum(dat),2)),
                    col=c("skyblue"),
-                   border = 'white',
-                   names.arg = c(paste0("Basic Pay\n£", basicPay),
-                                 paste0("Added Hrs\n£", addhrsPay), 
-                                 paste0("Out-of-Hrs\n£", enhrsPay),
-                                 paste0("W/E Suppl.\n£", weekendPay),
-                                 paste0("NROC\n£", NROCPay),
-                                 paste0("FPP\n£", FPPay)))
+                   border = "white",
+                   names.arg = c(paste0("Basic Pay\n£", values()$basicPay),
+                                 paste0("Added Hrs\n£", values()$addhrsPay), 
+                                 paste0("Out-of-Hrs\n£", values()$enhrsPay),
+                                 paste0("W/E Suppl.\n£", values()$weekendPay),
+                                 paste0("NROC\n£", values()$NROCPay),
+                                 paste0("FPP\n£", values()$FPPay)))
            
    })
 })
