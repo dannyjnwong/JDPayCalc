@@ -5,7 +5,7 @@ library(xtable)
 ui <- shinyUI(fluidPage(
    
    # Application title
-   titlePanel("Junior Doctors' Pay Calculator v.0.4"),
+   titlePanel("Junior Doctors' Pay Calculator v.0.5"),
    p("Instructions: You will need to have knowledge of the rota you will likely be working on for accurate calculations. Work out the average number of hours worked per week and the average number of enhanced hours (hours between 21:00-08:00hrs) worked per week."), 
    p("This calculator at the moment does not model earnings for trainees on Less-Than-Full-Time (LTFT) training. It also does not calculate remuneration for all work done beyond rostered hour arrangements, pay protection arrangements, nor income tax. If you are using this on a mobile device, the bar chart is best viewed in landscape mode."),
    a(href="https://github.com/dannyjnwong/JDPayCalc", "Click here to see the source code for this calculator."),
@@ -84,15 +84,23 @@ server <- shinyServer(function(input, output) {
                    nodalPoint <- 4
            }
            
-           hrlyPay <- basicPay/365.25*7/40
+           hrlyPay <- basicPay/(365/7*40)
            
-           if (input$weeklyHours>40) {
-                   addhrsPay <- (input$weeklyHours - 40) * hrlyPay * 365.25/7
+           if (input$weeklyHours>40 & input$weeklyHours<=48) {
+                   addhrsPay <- (input$weeklyHours - 40) * hrlyPay * 365/7
+           } else if (input$weeklyHours>48 & nodalPoint==1) {
+                   addhrsPay <- (8 * hrlyPay * 365/7) + ((input$weeklyHours - 48) * 23.13 * 365/7)
+           } else if (input$weeklyHours>48 & nodalPoint==2) {
+                   addhrsPay <- (8 * hrlyPay * 365/7) + ((input$weeklyHours - 48) * 26.78 * 365/7)
+           } else if (input$weeklyHours>48 & nodalPoint==3) {
+                   addhrsPay <- (8 * hrlyPay * 365/7) + ((input$weeklyHours - 48) * 31.68 * 365/7)
+           } else if (input$weeklyHours>48 & nodalPoint==4) {
+                   addhrsPay <- (8 * hrlyPay * 365/7) + ((input$weeklyHours - 48) * 40.16 * 365/7)
            } else {
                    addhrsPay <- 0
            }
            
-           enhrsPay <- input$enhancedHours * hrlyPay * 0.37 * 365.25/7
+           enhrsPay <- input$enhancedHours * hrlyPay * 0.37 * 365/7
            
            if (input$weekendFreq=="1:2") {
                    weekendPay <- basicPay * 0.10
@@ -213,6 +221,10 @@ server <- shinyServer(function(input, output) {
            text(4, max(dat[-1])+2000, 
                 labels = paste0("Total uplift = £", format(round(sum(dat[-1]),2), nsmall = 2),
                                 "\n(", format(round((sum(dat[-1])/(dat[1]))*100,2), nsmall = 2),"% of Basic Pay)"))
+           if (input$weeklyHours > 48) {
+                   text(4, dat[2]+5200,
+                        labels = "*Penalty rates apply on\nAdded Hrs above 48hrs/wk")
+           }
 
    output$payTable <- renderTable({
            
