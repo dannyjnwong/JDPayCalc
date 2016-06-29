@@ -201,15 +201,15 @@ server <- shinyServer(function(input, output) {
            dat <- cbind(values()$basicPay, values()$addhrsPay, values()$enhrsPay, values()$weekendPay, values()$NROCPay, values()$FPPay)
                               
            barplot(dat,
-                   main=paste0("Total Annual Salary = £",round(sum(dat),2)),
+                   main=paste0("Total Annual Salary = £",format(round(sum(dat),2), nsmall = 2)),
                    col=c("skyblue"),
                    border = "white",
-                   names.arg = c(paste0("Basic Pay\n£", values()$basicPay),
-                                 paste0("Added Hrs\n£", values()$addhrsPay), 
-                                 paste0("Out-of-Hrs\n£", values()$enhrsPay),
-                                 paste0("W/E Suppl.\n£", values()$weekendPay),
-                                 paste0("NROC\n£", values()$NROCPay),
-                                 paste0("FPP\n£", values()$FPPay)))
+                   names.arg = c(paste0("Basic Pay\n£", format(values()$basicPay, nsmall = 2)),
+                                 paste0("Added Hrs\n£", format(values()$addhrsPay, nsmall = 2)), 
+                                 paste0("Out-of-Hrs\n£", format(values()$enhrsPay, nsmall = 2)),
+                                 paste0("W/E Suppl.\n£", format(values()$weekendPay, nsmall = 2)),
+                                 paste0("NROC\n£", format(values()$NROCPay, nsmall = 2)),
+                                 paste0("FPP\n£", format(values()$FPPay, nsmall = 2))))
 
    output$payTable <- renderTable({
            
@@ -220,13 +220,13 @@ server <- shinyServer(function(input, output) {
                                            "NROC availability allowance",
                                            "Flexible Pay Premium",
                                            "Total"), 
-                             Pay = c(paste0("£", values()$basicPay), 
-                                     paste0("£", values()$addhrsPay), 
-                                     paste0("£", values()$enhrsPay), 
-                                     paste0("£", values()$weekendPay), 
-                                     paste0("£", values()$NROCPay), 
-                                     paste0("£", values()$FPPay),
-                                     paste0("£", sum(unlist(values()))))
+                             Pay = c(paste0("£", format(values()$basicPay, nsmall = 2)), 
+                                     paste0("£", format(values()$addhrsPay, nsmall = 2)), 
+                                     paste0("£", format(values()$enhrsPay, nsmall = 2)), 
+                                     paste0("£", format(values()$weekendPay, nsmall = 2)), 
+                                     paste0("£", format(values()$NROCPay, nsmall = 2)), 
+                                     paste0("£", format(values()$FPPay, nsmall = 2)),
+                                     paste0("£", format(sum(unlist(values())), nsmall = 2)))
            )
            
            xtable(tab)
