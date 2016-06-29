@@ -5,7 +5,7 @@ library(xtable)
 ui <- shinyUI(fluidPage(
    
    # Application title
-   titlePanel("Junior Doctors' Pay Calculator v.0.3"),
+   titlePanel("Junior Doctors' Pay Calculator v.0.4"),
    p("Instructions: You will need to have knowledge of the rota you will likely be working on for accurate calculations. Work out the average number of hours worked per week and the average number of enhanced hours (hours between 21:00-08:00hrs) worked per week."), 
    p("This calculator at the moment does not model earnings for trainees on Less-Than-Full-Time (LTFT) training. It also does not calculate remuneration for all work done beyond rostered hour arrangements, pay protection arrangements, nor income tax. If you are using this on a mobile device, the bar chart is best viewed in landscape mode."),
    a(href="https://github.com/dannyjnwong/JDPayCalc", "Click here to see the source code for this calculator."),
@@ -201,7 +201,7 @@ server <- shinyServer(function(input, output) {
            dat <- cbind(values()$basicPay, values()$addhrsPay, values()$enhrsPay, values()$weekendPay, values()$NROCPay, values()$FPPay)
                               
            barplot(dat,
-                   main=paste0("Total Annual Salary = £",format(round(sum(dat),2), nsmall = 2)),
+                   main=paste0("Total Annual Salary = £", format(round(sum(dat),2), nsmall = 2)),
                    col=c("skyblue"),
                    border = "white",
                    names.arg = c(paste0("Basic Pay\n£", format(values()$basicPay, nsmall = 2)),
@@ -210,6 +210,9 @@ server <- shinyServer(function(input, output) {
                                  paste0("W/E Suppl.\n£", format(values()$weekendPay, nsmall = 2)),
                                  paste0("NROC\n£", format(values()$NROCPay, nsmall = 2)),
                                  paste0("FPP\n£", format(values()$FPPay, nsmall = 2))))
+           text(4, max(dat[-1])+2000, 
+                labels = paste0("Total uplift = £", format(round(sum(dat[-1]),2), nsmall = 2),
+                                "\n(", format(round((sum(dat[-1])/(dat[1]))*100,2), nsmall = 2),"% of Basic Pay)"))
 
    output$payTable <- renderTable({
            
