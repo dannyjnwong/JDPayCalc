@@ -222,7 +222,7 @@ server <- shinyServer(function(input, output) {
                 labels = paste0("Total uplift = £", format(round(sum(dat[-1]),2), nsmall = 2),
                                 "\n(", format(round((sum(dat[-1])/(dat[1]))*100,2), nsmall = 2),"% of Basic Pay)"))
            if (input$weeklyHours > 48) {
-                   text(4, dat[2]+5200,
+                   text(4, dat[2]+6000,
                         labels = "*Penalty rates apply on\nAdded Hrs above 48hrs/wk")
            }
 
