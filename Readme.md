@@ -1,4 +1,4 @@
-# Junior Doctor Pay Calculator
+# Junior Doctor Pay Calculator [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.56805.svg)](https://doi.org/10.5281/zenodo.56805)
 
 The BMA and NHSE have been in negotiations over the Junior Doctors' contract.
 This is code for a Pay Calculator which can be seen [here](https://dannyjnwong.shinyapps.io/JDPayCalc).
